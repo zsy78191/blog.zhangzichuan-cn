@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+.output/
+.astro/
+
+# generated
+pagefind/
+*.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# misc
+*.tsbuildinfo
+.cache/
+
+# Lighthouse（子计划 08 在本地跑 lighthouse 时输出）
+lighthouse-*.report.json
+lighthouse-*.report.html

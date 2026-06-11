@@ -1,19 +1,21 @@
 ---
 import { SITE } from '../consts';
+
+const { title, description, locale } = SITE;
 ---
 
 <!doctype html>
-<html lang={SITE.locale}>
+<html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{SITE.title}</title>
-    <meta name="description" content={SITE.description} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
   </head>
   <body>
     <main>
-      <h1>{SITE.title}</h1>
-      <p>{SITE.description}</p>
+      <h1>{title}</h1>
+      <p>{description}</p>
     </main>
   </body>
 </html>

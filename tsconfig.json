@@ -1,5 +1,17 @@
 {
-  "extends": "astro/tsconfigs/base",
+  "extends": "astro/tsconfigs/strictest",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"],
+      "@components/*": ["src/components/*"],
+      "@layouts/*": ["src/layouts/*"],
+      "@utils/*": ["src/utils/*"],
+      "@consts": ["src/consts"]
+    },
+    "jsx": "preserve",
+    "verbatimModuleSyntax": true
+  },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "node_modules", "astro.config.mjs"]
+  "exclude": ["dist", "node_modules", "astro.config.mjs", "eslint.config.js"]
 }

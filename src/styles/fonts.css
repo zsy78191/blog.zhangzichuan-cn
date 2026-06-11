@@ -1,0 +1,6 @@
+/* 来自 @fontsource/noto-sans-sc；由 Vite 把 woff2 复制到 dist/_astro/。
+ * 不联网拉取（符合 SPEC 字体本地化约束）。
+ * 400 = regular 字重；700 = bold。
+ */
+@import '@fontsource/noto-sans-sc/400.css';
+@import '@fontsource/noto-sans-sc/700.css';

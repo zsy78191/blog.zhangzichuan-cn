@@ -25,6 +25,7 @@
   "dependencies": {
     "@astrojs/mdx": "^5.0.0",
     "@astrojs/rss": "^4.0.18",
+    "@fontsource/noto-sans-sc": "^5.2.9",
     "astro": "^5.18.2",
     "rehype-katex": "^7.0.1",
     "rehype-mermaid": "^3.0.0",

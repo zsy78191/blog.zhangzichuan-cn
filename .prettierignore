@@ -1,0 +1,8 @@
+dist
+node_modules
+docs
+.astro
+pagefind
+pnpm-lock.yaml
+public/pagefind
+

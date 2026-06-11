@@ -1,0 +1,66 @@
+---
+import { ICP, SITE, SOCIAL } from '@consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p class="copyright">&copy; {year} {SITE.author}. All rights reserved.</p>
+    <nav class="social" aria-label="社交与订阅">
+      <ul>
+        {
+          SOCIAL.map((s) => (
+            <li>
+              <a href={s.href} rel="noopener">
+                {s.name}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <p class="icp">
+      <a href={ICP.link} target="_blank" rel="noopener noreferrer">{ICP.text}</a>
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-top: 1px solid var(--border, #e5e7eb);
+    padding: 1.5rem 1rem;
+    margin-top: 4rem;
+    font-size: 0.9rem;
+    color: var(--fg-muted, #6b7280);
+  }
+  .footer-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .icp a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .icp a:hover {
+    text-decoration: underline;
+  }
+  .social ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .social a {
+    color: inherit;
+    text-decoration: none;
+  }
+  .social a:hover {
+    text-decoration: underline;
+  }
+</style>

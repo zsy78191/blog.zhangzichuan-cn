@@ -87,6 +87,10 @@ pagefind/
 # misc
 *.tsbuildinfo
 .cache/
+
+# Lighthouse（子计划 08 在本地跑 lighthouse 时输出）
+lighthouse-*.report.json
+lighthouse-*.report.html
 ```
 
 - [ ] **Step 2：提交**
@@ -136,9 +140,11 @@ git commit -m "chore: add .gitignore for Astro + Node"
 {
   "extends": "astro/tsconfigs/base",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist", "node_modules", "astro.config.mjs"]
 }
 ```
+
+> 排除 `astro.config.mjs`：该文件用 `defineConfig` 但属于 Node 配置，TS 不会真编译；显式排除避免 strict 阶段 IDE 误标。
 
 - [ ] **Step 3：写入 `src/env.d.ts`**
 
@@ -158,14 +164,14 @@ import { defineConfig } from 'astro/config';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.zhangzichuan.cn',
-  trailingSlash: 'ignore',
-  i18n: {
-    defaultLocale: 'zh-CN',
-    locales: ['zh-CN'],
-    routing: { prefixDefaultLocale: false },
-  },
+  // 静态站点统一带尾斜杠（与 build.format: 'directory' 一致），
+  // 避免 Google/Bing 把 /posts/foo 与 /posts/foo/ 视为重复内容。
+  trailingSlash: 'always',
+  build: { format: 'directory' },
 });
 ```
+
+> 不再注册 `i18n` 集成：单语言站点用 `<html lang="zh-CN">`（在 `BaseLayout` 显式声明）已足够；i18n 会让 Pagefind 与 sitemap 行为复杂化。
 
 - [ ] **Step 5：提交（先不装依赖，等 Task 1.1 一起装）**
 

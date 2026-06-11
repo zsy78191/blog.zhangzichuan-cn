@@ -37,6 +37,7 @@ pnpm add -D vitest @vitest/ui happy-dom
 
 ```ts
 import { defineConfig } from 'vitest/config';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig({
   test: {
@@ -46,15 +47,17 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': new URL('./src', import.meta.url).pathname,
-      '@components': new URL('./src/components', import.meta.url).pathname,
-      '@layouts': new URL('./src/layouts', import.meta.url).pathname,
-      '@utils': new URL('./src/utils', import.meta.url).pathname,
-      '@consts': new URL('./src/consts.ts', import.meta.url).pathname,
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      '@components': fileURLToPath(new URL('./src/components', import.meta.url)),
+      '@layouts': fileURLToPath(new URL('./src/layouts', import.meta.url)),
+      '@utils': fileURLToPath(new URL('./src/utils', import.meta.url)),
+      '@consts': fileURLToPath(new URL('./src/consts.ts', import.meta.url)),
     },
   },
 });
 ```
+
+> 用 `fileURLToPath` 而非 `.pathname`：避免 macOS/Linux 路径含空格或非 ASCII 字符被 URL-encode 后解析失败；同时 Windows 兼容。
 
 - [ ] **Step 3：补 `package.json` scripts**
 
@@ -318,12 +321,8 @@ import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.zhangzichuan.cn',
-  trailingSlash: 'ignore',
-  i18n: {
-    defaultLocale: 'zh-CN',
-    locales: ['zh-CN'],
-    routing: { prefixDefaultLocale: false },
-  },
+  trailingSlash: 'always',
+  build: { format: 'directory' },
   integrations: [mdx()],
 });
 ```

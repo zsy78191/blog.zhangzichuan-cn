@@ -6,7 +6,7 @@
 
 **涉及文件：**
 - 创建：`src/layouts/BaseLayout.astro`、`src/layouts/PostLayout.astro`
-- 页面：`src/pages/index.astro`（覆盖）、`src/pages/about.md`、`src/pages/archive.astro`、`src/pages/404.astro`、`src/pages/tags/index.astro`、`src/pages/tags/[tag].astro`、`src/pages/categories/index.astro`、`src/pages/categories/[category].astro`、`src/pages/posts/[...slug].astro`
+- 页面：`src/pages/index.astro`（覆盖）、`src/pages/about.astro`、`src/pages/archive.astro`、`src/pages/404.astro`、`src/pages/tags/index.astro`、`src/pages/tags/[tag].astro`、`src/pages/categories/index.astro`、`src/pages/categories/[category].astro`、`src/pages/posts/[...slug].astro`
 - 全局样式：`src/styles/global.css`
 - 测试：`tests/layouts/BaseLayout.test.ts`
 
@@ -101,6 +101,7 @@ describe('BaseLayout', () => {
   test('含 OG、canonical、ICP 备案号', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(BaseLayout, {
+      request: new Request('https://blog.zhangzichuan.cn/test/'),
       props: { title: '测试页', description: 'desc' },
       slots: { default: '<p>hello</p>' },
     });
@@ -238,28 +239,28 @@ const recent = posts.slice(0, 5);
 </BaseLayout>
 ```
 
-- [ ] **Step 2：写 `src/pages/about.md`**
+- [ ] **Step 2：写 `src/pages/about.astro`**
 
-文件：`src/pages/about.md`
+> 不用 markdown layout：Astro 5 中 markdown `layout:` 字段会把 frontmatter 包成 `{ frontmatter: {...} }` 传给 layout，而 `BaseLayout` 期望扁平 props（`title`、`description`）。直接用 `.astro` 显式调用最稳。
 
-```markdown
+文件：`src/pages/about.astro`
+
+```astro
 ---
-layout: ../layouts/BaseLayout.astro
-title: 关于
-description: 关于本站与作者
-activeNav: /about
+import BaseLayout from '@layouts/BaseLayout.astro';
 ---
 
-# 关于
+<BaseLayout title="关于" description="关于本站与作者" activeNav="/about">
+  <h1>关于</h1>
+  <p>你好，我是 <strong>zhangchao</strong>。</p>
+  <p>这是我的个人博客，记录技术笔记、工程实践与偶尔的杂谈。</p>
 
-你好，我是 **zhangchao**。
-
-这是我的个人博客，记录技术笔记、工程实践与偶尔的杂谈。
-
-## 联系方式
-
-- GitHub: <https://github.com/zhangchao>
-- RSS: [/rss.xml](/rss.xml)
+  <h2>联系方式</h2>
+  <ul>
+    <li>GitHub: <a href="https://github.com/zhangchao" rel="noopener noreferrer">github.com/zhangchao</a></li>
+    <li>RSS: <a href="/rss.xml">/rss.xml</a></li>
+  </ul>
+</BaseLayout>
 ```
 
 - [ ] **Step 3：写 `src/pages/archive.astro`**
@@ -340,7 +341,7 @@ pnpm typecheck && pnpm lint && pnpm format
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add src/pages/index.astro src/pages/archive.astro src/pages/about.md src/pages/404.astro
+git add src/pages/index.astro src/pages/archive.astro src/pages/about.astro src/pages/404.astro
 git commit -m "feat(pages): index, archive, about, 404 with draft filter"
 ```
 
@@ -626,15 +627,26 @@ interface Props {
   post: CollectionEntry<'blog'>;
 }
 const { post } = Astro.props as Props;
-const { title, description, pubDatetime, tags, math, mermaid } = post.data;
+const { title, description, pubDatetime, tags, math } = post.data;
 ---
+
+{/*
+  KaTeX CSS：使用 npm 包本地 import，构建时由 Astro 打到 _astro/ 目录，
+  与字体不联网原则一致；不再走 jsdelivr CDN（大陆访问不稳定）。
+  仅在 math: true 的文章引入。katex 已在子计划 05 装入 devDependencies。
+
+  Mermaid：由 rehype-mermaid 在 SSR 期 strategy: 'img' 直接出 PNG/SVG，
+  HTML 中已是 <img>，无需任何客户端 JS，删除原先的客户端 fallback 块。
+*/}
 
 <BaseLayout
   title={title}
   description={description}
   activeNav={undefined}
 >
-  <article>
+  {/* data-pagefind-body 告诉 Pagefind 仅索引 <article> 内的正文，不索引
+   * 导航/页脚/标签云。M7：e2e 选择器搜索输入框时应为 `input.pagefind-ui__search-input`。 */}
+  <article data-pagefind-body>
     <header class="post-header">
       <h1>{title}</h1>
       <p class="post-meta">
@@ -642,20 +654,11 @@ const { title, description, pubDatetime, tags, math, mermaid } = post.data;
       </p>
     </header>
 
-    {math && <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous" />}
+    {math && <style is:global>{`@import 'katex/dist/katex.min.css';`}</style>}
 
     <Prose>
       <slot />
     </Prose>
-
-    {mermaid && (
-      <script type="module">
-        import('https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs')
-          .then(({ default: mermaid }) => {
-            mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
-          });
-      </script>
-    )}
 
     {tags.length > 0 && (
       <footer class="post-footer">
@@ -684,6 +687,8 @@ const { title, description, pubDatetime, tags, math, mermaid } = post.data;
   }
 </style>
 ```
+
+> 关于按文章条件注入 KaTeX CSS：上面用 `<style is:global>{`@import 'katex/dist/katex.min.css';`}</style>`，Astro/Vite 会把 `@import` 解析为 npm 包路径并把对应 CSS 与字体打到 `_astro/`。如该写法在你本地 Astro 版本下不解析（少见），改为 frontmatter 顶部直接 `import 'katex/dist/katex.min.css';`（无条件注入，但所有文章页都带 ~25KB CSS；体积代价小，可接受）。
 
 - [ ] **Step 2：写 `src/pages/posts/[...slug].astro`**
 

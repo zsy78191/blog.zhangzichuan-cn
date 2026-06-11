@@ -6,7 +6,7 @@
 
 **涉及文件：**
 - 修改：`tsconfig.json`、`package.json`
-- 创建：`.eslintrc.cjs`、`.eslintignore`、`.prettierrc`、`.prettierignore`、`.vscode/extensions.json`、`.vscode/settings.json`
+- 创建：`eslint.config.js`、`.prettierrc`、`.prettierignore`、`.vscode/extensions.json`、`.vscode/settings.json`
 
 **前置：** 子计划 00 完成
 
@@ -39,7 +39,7 @@
     "verbatimModuleSyntax": true
   },
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "node_modules"]
+  "exclude": ["dist", "node_modules", "astro.config.mjs", "eslint.config.js"]
 }
 ```
 
@@ -106,77 +106,70 @@ git commit -m "chore(toolchain): enable TypeScript strictest with path aliases"
 ## Task 1.2：ESLint + Prettier 配置
 
 **Files:**
-- 创建：`.eslintrc.cjs`、`.eslintignore`、`.prettierrc`、`.prettierignore`
+- 创建：`eslint.config.js`、`.prettierrc`、`.prettierignore`
 - 修改：`package.json`（加 scripts）
 
-- [ ] **Step 1：装依赖**
+> **关于 ESLint 版本**：本计划使用 ESLint 9（flat config）。ESLint 9 默认不再支持 `.eslintrc.cjs`，必须用 `eslint.config.js`（flat config）。
+
+- [ ] **Step 1：装依赖（ESLint 9 + flat config 对齐的插件版本）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D eslint @typescript-eslint/parser @typescript-eslint/eslint-plugin \
-  eslint-plugin-astro eslint-plugin-jsx-a11y \
+pnpm add -D eslint@^9 typescript-eslint \
+  eslint-plugin-astro@^1 eslint-plugin-jsx-a11y \
+  globals \
   prettier prettier-plugin-astro
 ```
 
-- [ ] **Step 2：写入 `.eslintrc.cjs`**
+- [ ] **Step 2：写入 `eslint.config.js`（flat config）**
 
-文件：`.eslintrc.cjs`
+文件：`eslint.config.js`
 
 ```js
-/* eslint-env node */
-module.exports = {
-  root: true,
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    extraFileExtensions: ['.astro'],
+// @ts-check
+import js from '@eslint/js';
+import tseslint from 'typescript-eslint';
+import astro from 'eslint-plugin-astro';
+import globals from 'globals';
+
+export default [
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      '.astro/**',
+      'pagefind/**',
+      'public/**',
+      'pnpm-lock.yaml',
+    ],
   },
-  env: { browser: true, node: true, es2022: true },
-  extends: [
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:astro/recommended',
-    'plugin:jsx-a11y/recommended',
-  ],
-  plugins: ['@typescript-eslint'],
-  overrides: [
-    {
-      files: ['*.astro'],
-      parser: 'astro-eslint-parser',
-      parserOptions: {
-        parser: '@typescript-eslint/parser',
-        extraFileExtensions: ['.astro'],
-      },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  ...astro.configs['flat/recommended'],
+  ...astro.configs['flat/jsx-a11y-recommended'],
+  {
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: { ...globals.browser, ...globals.node },
     },
-    {
-      files: ['*.cjs'],
-      env: { node: true },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
     },
-  ],
-  ignorePatterns: ['dist', 'node_modules', '.astro', 'pagefind'],
-  rules: {
-    '@typescript-eslint/consistent-type-imports': 'error',
-    '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-    'no-console': ['warn', { allow: ['warn', 'error', 'info'] }],
   },
-};
+  {
+    files: ['**/*.cjs'],
+    languageOptions: { sourceType: 'commonjs', globals: globals.node },
+  },
+];
 ```
 
-- [ ] **Step 3：写入 `.eslintignore`**
+> `eslint-plugin-astro` v1 提供 `flat/recommended` 与 `flat/jsx-a11y-recommended` preset，已内置 `astro-eslint-parser` 与 `<style>`/`<script>` 子语言支持。
+> `typescript-eslint` 是聚合包，等同于以前的 `@typescript-eslint/parser + eslint-plugin`，flat config 下用 spread 注册即可。
 
-文件：`.eslintignore`
-
-```
-dist
-node_modules
-.astro
-pagefind
-public
-pnpm-lock.yaml
-```
-
-- [ ] **Step 4：写入 `.prettierrc`**
+- [ ] **Step 3：写入 `.prettierrc`**
 
 文件：`.prettierrc`
 
@@ -196,7 +189,7 @@ pnpm-lock.yaml
 }
 ```
 
-- [ ] **Step 5：写入 `.prettierignore`**
+- [ ] **Step 4：写入 `.prettierignore`**
 
 文件：`.prettierignore`
 
@@ -209,9 +202,9 @@ pnpm-lock.yaml
 public/pagefind
 ```
 
-- [ ] **Step 6：补 `package.json` scripts**
+- [ ] **Step 5：补 `package.json` scripts**
 
-修改 `package.json` 的 `scripts` 段（保留 dev/build/preview/astro，新增下面四项）：
+修改 `package.json` 的 `scripts` 段（保留 dev/build/preview/astro，新增下面四项；注意 `lint` 不再用 `--ext`，flat config 不支持，改用 ESLint 自身的 `files` 解析）：
 
 ```json
 {
@@ -222,15 +215,15 @@ public/pagefind
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
-    "lint": "eslint . --ext .ts,.astro,.cjs",
-    "lint:fix": "eslint . --ext .ts,.astro,.cjs --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   }
 }
 ```
 
-- [ ] **Step 7：跑三个门**
+- [ ] **Step 6：跑三个门**
 
 ```bash
 cd /Users/zhangchao/2026/blog
@@ -242,7 +235,7 @@ pnpm format:check
 
 如 `pnpm format:check` 失败，跑 `pnpm format` 自动格式化后重试。
 
-- [ ] **Step 8：跑 build 验证**
+- [ ] **Step 7：跑 build 验证**
 
 ```bash
 cd /Users/zhangchao/2026/blog
@@ -250,12 +243,12 @@ pnpm build
 # 期望：astro check 阶段无错；astro build 输出 dist/
 ```
 
-- [ ] **Step 9：提交**
+- [ ] **Step 8：提交**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add .eslintrc.cjs .eslintignore .prettierrc .prettierignore package.json pnpm-lock.yaml
-git commit -m "chore(toolchain): add ESLint, Prettier, typecheck/lint/format scripts"
+git add eslint.config.js .prettierrc .prettierignore package.json pnpm-lock.yaml
+git commit -m "chore(toolchain): add ESLint 9 flat config + Prettier + scripts"
 ```
 
 ---

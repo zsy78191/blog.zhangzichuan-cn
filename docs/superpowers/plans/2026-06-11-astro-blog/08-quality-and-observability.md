@@ -128,10 +128,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup pnpm
+        # B6：原版缺失 pnpm/Node setup，lychee job 会因 pnpm 命令不存在而失败
+        uses: pnpm/action-setup@v4
+        with:
+          version: '9'
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # B1：构建需要 chromium（rehype-mermaid strategy: 'img'）
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Build
-        run: |
-          pnpm install --frozen-lockfile
-          pnpm build
+        run: pnpm build
 
       - name: lychee link checker
         uses: lycheeverse/lychee-action@v2
@@ -264,8 +281,10 @@ import { expect, test } from '@playwright/test';
 
 test('search returns results for "你好"', async ({ page }) => {
   await page.goto('/search');
-  await page.waitForSelector('input[type="search"]', { timeout: 5000 });
-  await page.fill('input[type="search"]', '你好');
+  // M7：Pagefind UI 实际生成的是 <input class="pagefind-ui__search-input">，
+  // 不能用 input[type=search]（实际是 text）或其他通用 selector。
+  await page.waitForSelector('input.pagefind-ui__search-input', { timeout: 5000 });
+  await page.fill('input.pagefind-ui__search-input', '你好');
   await expect(page.getByText('你好，世界').first()).toBeVisible({ timeout: 5000 });
 });
 ```

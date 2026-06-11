@@ -62,19 +62,25 @@ import Footer from '@components/Footer.astro';
 describe('Footer', () => {
   test('显示 ICP 备案号并链接到工信部', async () => {
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Footer);
+    const html = await container.renderToString(Footer, {
+      request: new Request('https://blog.zhangzichuan.cn/'),
+    });
     expect(html).toContain('苏ICP备18064390号-8');
     expect(html).toContain('https://beian.miit.gov.cn/');
   });
 
   test('包含 copyright 与 RSS 链接', async () => {
     const container = await AstroContainer.create();
-    const html = await container.renderToString(Footer);
+    const html = await container.renderToString(Footer, {
+      request: new Request('https://blog.zhangzichuan.cn/'),
+    });
     expect(html).toMatch(/©\s*\d{4}/);
     expect(html).toContain('/rss.xml');
   });
 });
 ```
+
+> 所有 `renderToString` 调用都显式传 `request`，让组件内的 `Astro.url` 能解析出确定的 pathname，避免不同 Astro minor 版本下 `Astro.url` 为空导致 canonical 失效。
 
 - [ ] **Step 2：跑测试看失败**
 
@@ -381,6 +387,7 @@ describe('PostCard', () => {
   test('渲染标题、日期、tags', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(PostCard, {
+      request: new Request('https://blog.zhangzichuan.cn/'),
       props: {
         post: {
           slug: 'hello-world',
@@ -536,6 +543,7 @@ describe('TagList', () => {
   test('渲染传入的 tags 列表与正确 URL', async () => {
     const container = await AstroContainer.create();
     const html = await container.renderToString(TagList, {
+      request: new Request('https://blog.zhangzichuan.cn/'),
       props: { tags: ['随笔', 'Meta'] },
     });
     expect(html).toContain('/tags/随笔');

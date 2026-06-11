@@ -212,10 +212,15 @@ URL：https://github.com/zhangchao/blog.zhangzichuan-cn/actions
   <script
     defer
     src="https://static.cloudflareinsights.com/beacon.min.js"
-    data-cf-beacon={`{"token": "${import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN}"}`}
+    /* M8：用 JSON.stringify 序列化 JSON payload，防止 token 来自
+     * import.meta.env（理论上可信，但生产 env 来自 .env/.env.* 文本拼接），
+     * 一旦含 `</script>` 等会提前闭合本标签造成 XSS。 */
+    data-cf-beacon={JSON.stringify({ token: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN })}
   />
 )}
 ```
+
+> 补充：token 形如 `abc123def456`，结构上不会含 `</script>`；但 SECURITY 原则是"把 XSS 防御写在边界"，用 `JSON.stringify` 是免费且无副作用的做法。
 
 - [ ] **Step 9：本地确认 Web Analytics 变量被正确读取**
 

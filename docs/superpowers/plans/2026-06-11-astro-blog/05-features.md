@@ -20,23 +20,33 @@
 
 ---
 
-## Task 5.1：装 Pagefind + sitemap + KaTeX + Mermaid
+## Task 5.1：装 Pagefind + sitemap + KaTeX + Mermaid + Playwright
 
 **Files:**
 - 修改：`package.json`
 
-- [ ] **Step 1：装依赖**
+- [ ] **Step 1：装依赖（含 playwright，rehype-mermaid 的 `strategy: 'img'` 依赖 puppeteer/playwright 启动无头浏览器渲染 SVG）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D pagefind @astrojs/sitemap
+pnpm add -D pagefind @astrojs/sitemap playwright
 pnpm add remark-math rehype-katex rehype-mermaid remark-gfm
 pnpm add -D katex
 ```
 
-- [ ] **Step 2：补 `package.json` scripts**
+- [ ] **Step 2：安装 Playwright 的 Chromium 浏览器（mermaid SSR 必需）**
 
-修改 `scripts` 段新增：
+```bash
+cd /Users/zhangchao/2026/blog
+pnpm exec playwright install --with-deps chromium
+```
+
+> `rehype-mermaid` 默认会用 `playwright-core` + 系统已装的浏览器；为了 CI/本地一致，显式安装 chromium。CI 流程在子计划 06 处理。
+> 也可改用 `puppeteer`，但 playwright 与 GitHub Actions runner 兼容性更好。
+
+- [ ] **Step 3：补 `package.json` scripts**
+
+修改 `scripts` 段新增 `search:build`，并把 `build` 链上 pagefind：
 
 ```json
 {
@@ -47,8 +57,8 @@ pnpm add -D katex
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
-    "lint": "eslint . --ext .ts,.astro,.cjs",
-    "lint:fix": "eslint . --ext .ts,.astro,.cjs --fix",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -58,19 +68,21 @@ pnpm add -D katex
 }
 ```
 
-- [ ] **Step 3：跑 typecheck**
+> `lint` 不再用 `--ext`：ESLint 9 flat config 不支持该参数，文件类型已通过 `eslint.config.js` 与 `eslint-plugin-astro` 的 preset 解析。
+
+- [ ] **Step 4：跑 typecheck**
 
 ```bash
 cd /Users/zhangchao/2026/blog
 pnpm typecheck
 ```
 
-- [ ] **Step 4：提交**
+- [ ] **Step 5：提交**
 
 ```bash
 cd /Users/zhangchao/2026/blog
 git add package.json pnpm-lock.yaml
-git commit -m "chore(deps): add pagefind, sitemap, katex, mermaid, math plugins"
+git commit -m "chore(deps): add pagefind, sitemap, katex, mermaid, playwright"
 ```
 
 ---
@@ -96,17 +108,17 @@ import rehypeMermaid from 'rehype-mermaid';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://blog.zhangzichuan.cn',
-  trailingSlash: 'ignore',
-  i18n: {
-    defaultLocale: 'zh-CN',
-    locales: ['zh-CN'],
-    routing: { prefixDefaultLocale: false },
-  },
+  // 与子计划 00 保持一致：所有 URL 带尾斜杠，避免重复内容
+  trailingSlash: 'always',
+  build: { format: 'directory' },
   integrations: [mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkMath],
     rehypePlugins: [
       rehypeKatex,
+      // strategy: 'img' 在构建时用 Playwright 启动 chromium 把 mermaid 代码
+      // 块转成 <img src="data:image/svg+xml;..."/>；这意味着构建依赖 chromium，
+      // 但浏览器端不再需要任何 mermaid JS。playwright/chromium 在 Task 5.1 已装。
       [rehypeMermaid, { strategy: 'img' }],
     ],
     shikiConfig: {
@@ -117,6 +129,8 @@ export default defineConfig({
   prefetch: { defaultStrategy: 'viewport' },
 });
 ```
+
+> 不再注册 `i18n` 集成：单语言站点用 `<html lang="zh-CN">` 已足够（已在 `BaseLayout` 声明）。
 
 - [ ] **Step 2：跑 build 验证（KaTeX 渲染 + Mermaid 转图）**
 
@@ -183,6 +197,12 @@ import BaseLayout from '@layouts/BaseLayout.astro';
     });
   });
 </script>
+{/*
+  M7（审计）：e2e 选择器必须用 Pagefind UI 注入后的实际 DOM class
+  `input.pagefind-ui__search-input`，不能写 `input[type=search]`（实际是 text）。
+  Pagefind 默认生成的搜索框 class 已固定，本计划 e2e 套件按此选择器编写。
+  PostLayout 已对 <article> 加 data-pagefind-body，仅索引正文。
+ */}
 
 <style>
   main {
@@ -247,15 +267,18 @@ import type { APIContext } from 'astro';
 
 export async function GET(context: APIContext) {
   const posts = sortByPubDatetime(filterDraft(await getCollection('blog')));
+  const siteUrl = context.site ?? new URL(SITE.url);
   return rss({
     title: SITE.title,
     description: SITE.description,
-    site: context.site ?? SITE.url,
+    site: siteUrl,
     items: posts.map((p) => ({
       title: p.data.title,
       description: p.data.description,
       pubDate: p.data.pubDatetime,
-      link: `/posts/${p.id}`,
+      // 必须是绝对 URL：相对路径会导致大部分 RSS 阅读器无法跳转
+      // trailingSlash: 'always' → 必须带尾斜杠保持与站内一致
+      link: new URL(`/posts/${p.id}/`, siteUrl).toString(),
       categories: p.data.tags,
     })),
     customData: '<language>zh-CN</language>',
@@ -295,43 +318,32 @@ git commit -m "feat(rss): RSS 2.0 feed filtered for drafts"
 ## Task 5.5：本地中文字体子集
 
 **Files:**
-- 创建：`public/fonts/NotoSansSC-Regular.subset.woff2`（下载）
+- 修改：`package.json`
 - 创建：`src/styles/fonts.css`
 
-- [ ] **Step 1：创建字体目录**
+> jsdelivr 上的 `noto-sans-sc@1.0.0/fonts/Subset/...` 路径已 404，不能用 curl 拉。改用 `@fontsource/noto-sans-sc`（fontsource 把字体文件打进 `node_modules`，再由 Vite 复制到 dist；完全离线）。
+
+- [ ] **Step 1：装 @fontsource 包**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-mkdir -p public/fonts
+pnpm add @fontsource/noto-sans-sc
 ```
 
-- [ ] **Step 2：下载 Noto Sans SC 子集 woff2**
-
-```bash
-cd /Users/zhangchao/2026/blog
-curl -L -o public/fonts/NotoSansSC-Regular.subset.woff2 \
-  'https://cdn.jsdelivr.net/npm/noto-sans-sc@1.0.0/fonts/Subset/NotoSansSC-Regular.woff2'
-ls -lh public/fonts/
-# 期望：~3MB（CDN 官方子集；未来如要再子集化，使用 fonttools / glyphhanger）
-```
-
-> 注意：此 woff2 是"按字符集合的官方子集"，不是"按文章字符动态子集"。SPEC §13 提到的"未来用 fonttools 重新生成"指的是后者；MVP 阶段直接用官方子集可接受。
-
-- [ ] **Step 3：写 `src/styles/fonts.css`**
+- [ ] **Step 2：写 `src/styles/fonts.css`**
 
 文件：`src/styles/fonts.css`
 
 ```css
-@font-face {
-  font-family: 'Noto Sans SC';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('/fonts/NotoSansSC-Regular.subset.woff2') format('woff2');
-}
+/* 来自 @fontsource/noto-sans-sc；由 Vite 把 woff2 复制到 dist/_astro/。
+ * 不联网拉取（符合 SPEC 字体本地化约束）。
+ * 400 = regular 字重；如需 700 改 import 对应 css。
+ */
+@import '@fontsource/noto-sans-sc/400.css';
+@import '@fontsource/noto-sans-sc/700.css';
 ```
 
-- [ ] **Step 4：在 `BaseLayout.astro` 中 import 字体**
+- [ ] **Step 3：在 `BaseLayout.astro` 中 import 字体**
 
 修改 `src/layouts/BaseLayout.astro` 的 frontmatter 段：在原有 `import '../styles/global.css';` 之前增加一行：
 
@@ -346,13 +358,30 @@ import '../styles/global.css';
 ---
 ```
 
+- [ ] **Step 4：在 `src/styles/global.css` 中指定 font-family**
+
+确保 `src/styles/global.css` 至少包含（按需扩展）：
+
+```css
+:root {
+  --font-sans:
+    'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Microsoft YaHei', system-ui, sans-serif;
+}
+
+html {
+  font-family: var(--font-sans);
+}
+```
+
 - [ ] **Step 5：跑 build 验证字体被打包到 dist**
 
 ```bash
 cd /Users/zhangchao/2026/blog
 pnpm build
-ls dist/fonts/
-# 期望：NotoSansSC-Regular.subset.woff2
+# @fontsource 字体在 Vite 处理后落到 dist/_astro/，文件名带哈希
+ls dist/_astro/ | grep -i 'noto' | head
+# 期望：看到 noto-sans-sc-<hash>.woff2 等
 ```
 
 - [ ] **Step 6：跑 typecheck + lint + format**
@@ -366,8 +395,8 @@ pnpm typecheck && pnpm lint && pnpm format
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add public/fonts/NotoSansSC-Regular.subset.woff2 src/styles/fonts.css src/layouts/BaseLayout.astro
-git commit -m "feat(fonts): local Noto Sans SC subset, no network fetch"
+git add package.json pnpm-lock.yaml src/styles/fonts.css src/styles/global.css src/layouts/BaseLayout.astro
+git commit -m "feat(fonts): use @fontsource/noto-sans-sc (offline, no CDN fetch)"
 ```
 
 ---
@@ -395,10 +424,10 @@ test -d dist/pagefind && echo "PAGEFIND OK"
 grep -q '<rss version="2.0">' dist/rss.xml && echo "RSS OK"
 # KaTeX
 grep -q 'katex' dist/posts/with-math-and-mermaid/index.html && echo "KATEX OK"
-# Mermaid
-grep -q 'mermaid' dist/posts/with-math-and-mermaid/index.html && echo "MERMAID OK"
+# Mermaid：rehype-mermaid strategy: 'img' 把代码块转成 <img>，不应再含 <pre class="mermaid">
+grep -q '<img' dist/posts/with-math-and-mermaid/index.html && echo "MERMAID IMG OK"
 # 字体
-test -f dist/fonts/NotoSansSC-Regular.subset.woff2 && echo "FONTS OK"
+ls dist/_astro/ | grep -qi 'noto' && echo "FONTS OK"
 # 草稿过滤
 test ! -e dist/posts/draft-post && echo "DRAFT FILTERED OK"
 ```

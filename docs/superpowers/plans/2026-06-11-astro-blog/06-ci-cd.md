@@ -101,8 +101,10 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
+        # m11：pnpm 版本必须传字符串 "9"，不要传整数 9（pnpm/action-setup@v4 内部
+        # 会对 version 做语义比较，传数字会被识别为无效或默认到 latest）。
         with:
-          version: 9
+          version: '9'
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -112,6 +114,10 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # B1：构建需要 chromium（rehype-mermaid strategy: 'img'）；CI 与 deploy 都要装
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Typecheck
         run: pnpm typecheck
@@ -136,6 +142,8 @@ jobs:
           retention-days: 7
           if-no-files-found: error
 ```
+
+> M12（审计）：deploy 重复 build（不上传 artifact）会浪费约 2–3 分钟，但能保证构建与部署 100% 一致，避免 CI 通过但 deploy 失败、还要调试到底是哪边的问题。本项目是个人博客，成本可接受；不合并 build。
 
 - [ ] **Step 2：本地语法校验（不依赖 act）**
 
@@ -167,6 +175,9 @@ git commit -m "ci: GitHub Actions workflow for typecheck/lint/test/build"
 **Files:**
 - 创建：`.github/workflows/deploy.yml`
 
+> B4：原计划用 `cloudflare/pages-action@v1`，该 action 已被官方 archive（"Pages 部署请使用 wrangler-action"）。改用 `cloudflare/wrangler-action@v3`，通过 `command: pages deploy dist --project-name=...` 直接调用 wrangler。
+> 同步在两个 workflow 中安装 Playwright Chromium（rehype-mermaid SSR 必需）。Step 安装时间约 30s，pnpm 缓存能避免重复下载。
+
 - [ ] **Step 1：写 `.github/workflows/deploy.yml`**
 
 文件：`.github/workflows/deploy.yml`
@@ -177,6 +188,7 @@ name: deploy
 on:
   push:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: deploy-pages
@@ -197,7 +209,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: '9'
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -208,17 +220,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # B1：rehype-mermaid strategy: 'img' 在构建时启动 headless chromium 渲染 SVG。
+      # 复用 pnpm 已装的 playwright CLI 下载 chromium，--with-deps 会装系统依赖。
+      - name: Install Playwright Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Build
         run: pnpm build
 
+      # B4：cloudflare/wrangler-action@v3 是当前官方维护的 Cloudflare 部署 action。
+      # 之前用的 pages-action@v1 已 archive。
       - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: blog-zhangzichuan-cn
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: pages deploy dist --project-name=blog-zhangzichuan-cn --commit-dirty=true
         env:
           PUBLIC_CF_ANALYTICS_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_TOKEN }}
 ```

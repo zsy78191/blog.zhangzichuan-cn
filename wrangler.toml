@@ -1,0 +1,9 @@
+name = "blog-zhangzichuan-cn"
+compatibility_date = "2026-06-12"
+pages_build_output_dir = "dist"
+
+# Cloudflare Pages 不使用 Workers runtime，compatibility_date 仅用于 Pages Functions 兼容性。
+# 本站纯静态，不需要 Functions。
+
+# 注意：域名 blog.zhangzichuan.cn 已在 Cloudflare 托管，
+# 在 Pages 控制台 → Custom domains 一次性绑定即可。

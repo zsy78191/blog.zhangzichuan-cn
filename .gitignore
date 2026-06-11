@@ -29,3 +29,7 @@ pagefind/
 # Lighthouse（子计划 08 在本地跑 lighthouse 时输出）
 lighthouse-*.report.json
 lighthouse-*.report.html
+
+# wrangler
+.wrangler/
+.dev.vars

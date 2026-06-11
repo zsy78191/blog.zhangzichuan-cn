@@ -1,0 +1,53 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { filterDraft } from '@utils/filterDraft';
+import { getAllCategories } from '@utils/getAllCategories';
+
+const posts = filterDraft(await getCollection('blog'));
+const cats = getAllCategories(posts);
+---
+
+<BaseLayout title="分类" activeNav="/categories">
+  <h1>分类</h1>
+  {
+    cats.length === 0 ? (
+      <p>暂无分类。</p>
+    ) : (
+      <ul class="cat-list">
+        {cats.map(({ category, count }) => (
+          <li>
+            <a href={`/categories/${encodeURIComponent(category)}`}>
+              {category} <span class="count">({count})</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .cat-list {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .cat-list a {
+    color: var(--fg);
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    display: block;
+  }
+  .cat-list a:hover {
+    background: var(--bg-muted);
+  }
+  .count {
+    color: var(--fg-muted);
+    font-size: 0.85em;
+  }
+</style>

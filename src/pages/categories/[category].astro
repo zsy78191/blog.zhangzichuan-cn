@@ -1,0 +1,34 @@
+---
+import { getCollection, type CollectionEntry } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { filterDraft } from '@utils/filterDraft';
+import { sortByPubDatetime } from '@utils/sortByPubDatetime';
+
+export async function getStaticPaths() {
+  const posts = filterDraft(await getCollection('blog'));
+  const map = new Map<string, CollectionEntry<'blog'>[]>();
+  for (const p of posts) {
+    const c = p.data.category;
+    if (c === undefined) continue;
+    if (!map.has(c)) map.set(c, []);
+    map.get(c)!.push(p);
+  }
+  return [...map.entries()].map(([category, list]) => ({
+    params: { category },
+    props: { posts: sortByPubDatetime(list) },
+  }));
+}
+
+interface Props {
+  posts: CollectionEntry<'blog'>[];
+}
+const { category } = Astro.params;
+const { posts } = Astro.props as Props;
+---
+
+<BaseLayout title={category ?? ''} activeNav="/categories">
+  <h1>{category}</h1>
+  <p>{posts.length} 篇文章</p>
+  {posts.map((p) => <PostCard post={p} />)}
+</BaseLayout>

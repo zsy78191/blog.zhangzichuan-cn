@@ -1,0 +1,77 @@
+---
+import { NAV, SITE } from '@consts';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  activeNav?: string;
+}
+const { activeNav } = Astro.props as Props;
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <a class="brand" href="/">
+      <span class="brand-title">{SITE.title}</span>
+    </a>
+    <nav aria-label="主导航">
+      <ul>
+        {
+          NAV.map((item) => (
+            <li>
+              <a href={item.href} aria-current={activeNav === item.href ? 'page' : undefined}>
+                {item.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+    <ThemeToggle />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    border-bottom: 1px solid var(--border, #e5e7eb);
+    background: var(--bg, #fff);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  .header-inner {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  .brand {
+    text-decoration: none;
+    color: var(--fg, #111);
+    font-weight: 600;
+  }
+  nav {
+    flex: 1;
+  }
+  nav ul {
+    display: flex;
+    gap: 1rem;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  nav a {
+    color: var(--fg-muted, #6b7280);
+    text-decoration: none;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+  }
+  nav a:hover {
+    color: var(--fg, #111);
+  }
+  nav a[aria-current='page'] {
+    color: var(--fg, #111);
+    background: var(--bg-muted, #f3f4f6);
+  }
+</style>

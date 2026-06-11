@@ -1,0 +1,51 @@
+---
+
+---
+
+<button id="theme-toggle" type="button" aria-label="切换暗色模式" title="切换暗色模式">
+  <span class="icon-light" aria-hidden="true">☀</span>
+  <span class="icon-dark" aria-hidden="true">☾</span>
+</button>
+
+<script is:inline>
+  (() => {
+    const KEY = 'theme';
+    const root = document.documentElement;
+    const apply = (t) => root.setAttribute('data-theme', t);
+    const saved = localStorage.getItem(KEY);
+    if (saved === 'dark' || saved === 'light') {
+      apply(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      apply('dark');
+    } else {
+      apply('light');
+    }
+    const btn = document.getElementById('theme-toggle');
+    btn?.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      apply(next);
+      localStorage.setItem(KEY, next);
+    });
+  })();
+</script>
+
+<style>
+  #theme-toggle {
+    background: transparent;
+    border: 1px solid var(--border, #e5e7eb);
+    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+    font-size: 1rem;
+    color: var(--fg, #111);
+  }
+  #theme-toggle .icon-dark {
+    display: none;
+  }
+  :global([data-theme='dark']) #theme-toggle .icon-light {
+    display: none;
+  }
+  :global([data-theme='dark']) #theme-toggle .icon-dark {
+    display: inline;
+  }
+</style>

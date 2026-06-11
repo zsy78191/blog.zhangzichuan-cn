@@ -1,0 +1,48 @@
+:root {
+  --bg: #ffffff;
+  --bg-muted: #f3f4f6;
+  --fg: #111827;
+  --fg-muted: #6b7280;
+  --fg-inverse: #f9fafb;
+  --border: #e5e7eb;
+  --accent: #2563eb;
+}
+
+[data-theme='dark'] {
+  --bg: #0b1020;
+  --bg-muted: #1f2937;
+  --fg: #f3f4f6;
+  --fg-muted: #9ca3af;
+  --fg-inverse: #0b1020;
+  --border: #1f2937;
+  --accent: #60a5fa;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family:
+    'Noto Sans SC',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}

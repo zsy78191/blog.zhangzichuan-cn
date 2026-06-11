@@ -32,6 +32,15 @@ const ogImg = ogImage ? new URL(ogImage, SITE.url).toString() : undefined;
     <meta property="og:url" content={canonical} />
     {ogImg && <meta property="og:image" content={ogImg} />}
     <meta name="twitter:card" content="summary" />
+    {import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN && (
+      <script
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        /* M8：用 JSON.stringify 序列化 JSON payload，防止 token 中隐含
+         * `</script>` 提前闭合标签造成 XSS。 */
+        data-cf-beacon={JSON.stringify({ token: import.meta.env.PUBLIC_CF_ANALYTICS_TOKEN })}
+      />
+    )}
   </head>
   <body>
     {activeNav ? <Header activeNav={activeNav} /> : <Header />}

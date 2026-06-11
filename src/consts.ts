@@ -1,5 +1,5 @@
 export const SITE = {
-  title: '子川的博客',
+  title: '张超的博客',
   description: '技术笔记、工程实践与偶尔的杂谈',
   author: 'zhangchao',
   url: 'https://blog.zhangzichuan.cn',

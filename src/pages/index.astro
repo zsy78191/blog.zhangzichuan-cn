@@ -1,21 +1,23 @@
 ---
-import { SITE } from '../consts';
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { SITE } from '@consts';
+import { filterDraft } from '@utils/filterDraft';
+import { sortByPubDatetime } from '@utils/sortByPubDatetime';
 
-const { title, description, locale } = SITE;
+const posts = sortByPubDatetime(filterDraft(await getCollection('blog')));
+const recent = posts.slice(0, 5);
 ---
 
-<!doctype html>
-<html lang={locale}>
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-  </head>
-  <body>
-    <main>
-      <h1>{title}</h1>
-      <p>{description}</p>
-    </main>
-  </body>
-</html>
+<BaseLayout title={SITE.title} activeNav="/">
+  <section class="intro">
+    <h1>{SITE.title}</h1>
+    <p>{SITE.description}</p>
+  </section>
+
+  <section class="recent">
+    <h2>最新文章</h2>
+    {recent.length === 0 ? <p>暂无文章。</p> : recent.map((p) => <PostCard post={p} />)}
+  </section>
+</BaseLayout>

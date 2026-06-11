@@ -1,0 +1,36 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { filterDraft } from '@utils/filterDraft';
+import { sortByPubDatetime } from '@utils/sortByPubDatetime';
+
+const posts = sortByPubDatetime(filterDraft(await getCollection('blog')));
+
+// 按年分组
+const byYear = new Map<number, typeof posts>();
+for (const p of posts) {
+  const y = p.data.pubDatetime.getUTCFullYear();
+  if (!byYear.has(y)) byYear.set(y, []);
+  byYear.get(y)!.push(p);
+}
+const years = [...byYear.entries()].sort((a, b) => b[0] - a[0]);
+---
+
+<BaseLayout title="归档" activeNav="/archive">
+  <h1>归档</h1>
+  {
+    years.length === 0 ? (
+      <p>暂无文章。</p>
+    ) : (
+      years.map(([year, list]) => (
+        <section>
+          <h2>{year}</h2>
+          {list.map((p) => (
+            <PostCard post={p} />
+          ))}
+        </section>
+      ))
+    )
+  }
+</BaseLayout>

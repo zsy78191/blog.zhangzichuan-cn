@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build",
+    "build": "astro check && astro build && bun run search:build",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
@@ -16,17 +16,24 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "test:ui": "vitest --ui"
+    "test:ui": "vitest --ui",
+    "search:build": "pagefind --site dist"
   },
   "engines": {
     "node": "^20.3.0 || >=22.0.0"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.0",
-    "astro": "^5.18.2"
+    "astro": "^5.18.2",
+    "rehype-katex": "^7.0.1",
+    "rehype-mermaid": "^3.0.0",
+    "remark-gfm": "^4.0.1",
+    "remark-math": "^6.0.0",
+    "zod": "^3.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
+    "@astrojs/sitemap": "^3.7.3",
     "@eslint/js": "^9.39.4",
     "@types/node": "^25.9.3",
     "@vitest/ui": "^4.1.8",
@@ -35,6 +42,9 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "globals": "^17.6.0",
     "happy-dom": "^20.10.2",
+    "katex": "^0.17.0",
+    "pagefind": "^1.5.2",
+    "playwright": "^1.60.0",
     "prettier": "^3.8.4",
     "prettier-plugin-astro": "^0.14.1",
     "typescript": "^6.0.3",

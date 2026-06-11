@@ -1,0 +1,47 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="搜索" description="全文搜索" activeNav="/search">
+  <h1>搜索</h1>
+  <p>在 <a href="/archive">归档</a> 与所有文章内搜索。</p>
+  <div id="search"></div>
+
+  <noscript>
+    <p>
+      搜索功能需要启用 JavaScript。请启用后刷新页面，或前往 <a href="/archive">归档</a> 浏览全部文章。
+    </p>
+  </noscript>
+</BaseLayout>
+
+<link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+<script src="/pagefind/pagefind-ui.js" is:inline></script>
+<script is:inline>
+  window.addEventListener('DOMContentLoaded', () => {
+    // @ts-expect-error PagefindUI is loaded from script tag, not via import
+    new PagefindUI({
+      element: '#search',
+      resetStyles: false,
+      showImages: false,
+      showSubResults: true,
+      excerptLength: 30,
+    });
+  });
+</script>
+{
+  /*
+  M7（审计）：e2e 选择器必须用 Pagefind UI 注入后的实际 DOM class
+  `input.pagefind-ui__search-input`，不能写 `input[type=search]`（实际是 text）。
+  Pagefind 默认生成的搜索框 class 已固定，本计划 e2e 套件按此选择器编写。
+  PostLayout 已对 <article> 加 data-pagefind-body，仅索引正文。
+ */
+}
+
+<style>
+  main {
+    max-width: 720px;
+  }
+  #search {
+    margin-top: 1.5rem;
+  }
+</style>

@@ -100,7 +100,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -203,7 +203,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup bun
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4

@@ -130,7 +130,7 @@ jobs:
 
       - name: Setup bun
         # B6：原版缺失 bun/Node setup，lychee job 会因 bun 命令不存在而失败
-        uses: oven/setup-bun@v2
+        uses: oven-sh/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4

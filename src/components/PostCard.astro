@@ -1,0 +1,76 @@
+---
+import { formatDate } from '@utils/formatDate';
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+}
+const { post } = Astro.props as Props;
+const href = `/posts/${post.id}`;
+---
+
+<article class="post-card">
+  <a href={href} class="post-link">
+    <h2 class="post-title">{post.data.title}</h2>
+  </a>
+  <p class="post-meta">
+    <time datetime={post.data.pubDatetime.toISOString()}>
+      {formatDate(post.data.pubDatetime)}
+    </time>
+    {post.data.category && <span class="category"> · {post.data.category}</span>}
+  </p>
+  <p class="post-desc">{post.data.description}</p>
+  {
+    post.data.tags.length > 0 && (
+      <ul class="post-tags">
+        {post.data.tags.map((t) => (
+          <li>
+            <a href={`/tags/${encodeURIComponent(t)}`}>#{t}</a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .post-card {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border, #e5e7eb);
+  }
+  .post-link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .post-link:hover .post-title {
+    text-decoration: underline;
+  }
+  .post-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.25rem;
+  }
+  .post-meta {
+    margin: 0 0 0.5rem 0;
+    color: var(--fg-muted, #6b7280);
+    font-size: 0.85rem;
+  }
+  .post-desc {
+    margin: 0 0 0.5rem 0;
+  }
+  .post-tags {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  .post-tags a {
+    color: var(--fg-muted, #6b7280);
+    text-decoration: none;
+    font-size: 0.85rem;
+  }
+  .post-tags a:hover {
+    text-decoration: underline;
+  }
+</style>

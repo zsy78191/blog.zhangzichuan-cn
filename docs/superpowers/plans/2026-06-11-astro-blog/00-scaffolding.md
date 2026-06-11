@@ -1,6 +1,6 @@
 # 子计划 00：脚手架（Scaffolding）
 
-**子目标：** 从零建立项目骨架——初始化 git、装 Astro 5.x、建立 `src/consts.ts` 单一配置源、补 `.gitignore`，让 `pnpm dev` 能起来且只输出空首页。
+**子目标：** 从零建立项目骨架——初始化 git、装 Astro 5.x、建立 `src/consts.ts` 单一配置源、补 `.gitignore`，让 `bun run dev` 能起来且只输出空首页。
 
 **任务数：** 5
 
@@ -10,7 +10,7 @@
 
 **前置：** 无
 
-**完成标志：** `pnpm dev` 启动后访问 `http://localhost:4321/` 看到"子川的博客"占位文案；`pnpm build` 输出 `dist/index.html`。
+**完成标志：** `bun run dev` 启动后访问 `http://localhost:4321/` 看到"子川的博客"占位文案；`bun run build` 输出 `dist/index.html`。
 
 ---
 
@@ -262,18 +262,18 @@ import { SITE } from '../consts';
 </html>
 ```
 
-- [ ] **Step 2：装 Astro 与最小依赖（这是本子计划唯一一次 `pnpm install`）**
+- [ ] **Step 2：装 Astro 与最小依赖（这是本子计划唯一一次 `bun install`）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add astro@^5
+bun add astro@^5
 ```
 
 - [ ] **Step 3：跑 dev 验证（前台运行 3 秒后 Ctrl+C）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-timeout 5 pnpm dev || true
+timeout 5 bun run dev || true
 # 期望：stdout 出现 "Local: http://localhost:4321/"
 ```
 
@@ -281,7 +281,7 @@ timeout 5 pnpm dev || true
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：stdout 出现 "Complete!" 且 dist/index.html 存在
 ls dist/
 # 期望看到 index.html
@@ -291,7 +291,7 @@ ls dist/
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add src/pages/index.astro package.json pnpm-lock.yaml
+git add src/pages/index.astro package.json bun.lock
 git commit -m "feat(scaffold): placeholder homepage consuming SITE consts"
 git tag phase-00-scaffold
 git log --oneline
@@ -311,7 +311,7 @@ git tag --list 'phase-00*'
 
 进入 `01-toolchain.md` 前确认：
 
-- [ ] `pnpm build` 退出码 0
+- [ ] `bun run build` 退出码 0
 - [ ] `dist/index.html` 存在
 - [ ] `git tag phase-00-scaffold` 已存在
 - [ ] `src/consts.ts` 是所有页面/组件 import 配置的唯一来源

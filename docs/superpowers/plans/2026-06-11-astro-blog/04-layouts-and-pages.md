@@ -13,7 +13,7 @@
 **前置：** 子计划 03 完成
 
 **完成标志：**
-- `pnpm build` 成功
+- `bun run build` 成功
 - `dist/index.html`、`dist/archive/index.html`、`dist/about/index.html`、`dist/404.html`、`dist/tags/index.html`、`dist/tags/随笔/index.html`、`dist/categories/随笔/index.html`、`dist/posts/hello-world/index.html` 全部存在
 - **草稿 `draft-post.md` 不出现在 dist/ 任何路径下**
 - `BaseLayout` 测试断言 OG/canonical/ICP
@@ -117,7 +117,7 @@ describe('BaseLayout', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL
 ```
 
@@ -179,7 +179,7 @@ const ogImg = ogImage ? new URL(ogImage, SITE.url).toString() : undefined;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：5 passed
 ```
 
@@ -187,7 +187,7 @@ pnpm test
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 6：提交**
@@ -322,7 +322,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 ls dist/
 # 期望：包含 index.html、archive/、about/、404.html
 # 验证 dist/blog/ 或 dist/posts/draft-post/ 不应存在
@@ -334,7 +334,7 @@ test ! -e dist/posts/draft-post && echo "DRAFT FILTERED OK"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 7：提交**
@@ -454,7 +454,7 @@ const { posts } = Astro.props as Props;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：dist/tags/index.html、dist/tags/随笔/index.html、dist/tags/Meta/index.html、dist/tags/示例/index.html、dist/tags/Markdown/index.html 存在
 ls dist/tags/
 ```
@@ -463,7 +463,7 @@ ls dist/tags/
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 5：提交**
@@ -584,7 +584,7 @@ const { posts } = Astro.props as Props;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：dist/categories/index.html、dist/categories/随笔/index.html、dist/categories/技术/index.html 存在
 ls dist/categories/
 ```
@@ -593,7 +593,7 @@ ls dist/categories/
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 5：提交**
@@ -721,7 +721,7 @@ const { Content } = await render(post);
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：dist/posts/hello-world/index.html、dist/posts/with-math-and-mermaid/index.html 存在
 # 不应存在 dist/posts/draft-post/
 ls dist/posts/
@@ -733,7 +733,7 @@ test ! -e dist/posts/draft-post && echo "DRAFT FILTERED OK"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format && pnpm test
+bun run typecheck && bun run lint && bun run format && bun run test
 ```
 
 - [ ] **Step 5：打 tag**
@@ -751,10 +751,10 @@ git tag phase-04-layouts
 
 进入 `05-features.md` 前确认：
 
-- [ ] `pnpm build` 成功
+- [ ] `bun run build` 成功
 - [ ] `dist/posts/hello-world/index.html` 存在
 - [ ] `dist/posts/with-math-and-mermaid/index.html` 存在
 - [ ] `dist/posts/draft-post/` **不存在**（草稿过滤）
-- [ ] `pnpm test` 全过
+- [ ] `bun run test` 全过
 - [ ] `git tag phase-04-layouts` 已存在
 - [ ] 路由清单：`/`、`/archive`、`/about`、`/404`、`/tags`、`/tags/[tag]`、`/categories`、`/categories/[category]`、`/posts/[slug]`

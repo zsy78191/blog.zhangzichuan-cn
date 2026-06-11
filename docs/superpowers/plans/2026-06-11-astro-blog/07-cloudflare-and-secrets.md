@@ -226,7 +226,7 @@ URL：https://github.com/zhangchao/blog.zhangzichuan-cn/actions
 
 ```bash
 cd /Users/zhangchao/2026/blog
-PUBLIC_CF_ANALYTICS_TOKEN=test_token pnpm build
+PUBLIC_CF_ANALYTICS_TOKEN=test_token bun run build
 grep -r 'beacon.min.js' dist/
 # 期望：在每个 HTML 中找到 beacon.min.js 引用，且 data-cf-beacon 包含 test_token
 ```
@@ -282,6 +282,6 @@ git tag phase-07-cloudflare
 | 部署失败 `Authentication error [code: 10000]` | API Token 错或权限不够 | 重新创建 token，确认有 Pages: Edit 权限 |
 | 部署失败 `Project not found` | Pages 项目名与 wrangler 不一致 | 确认 `wrangler.toml` 中 `name` 与控制台一致 |
 | 自定义域 SSL 一直 pending | Cloudflare 还没完成证书签发 | 通常 5 分钟内，超过 30 分钟检查 NS 记录 |
-| `/search` 空白 | Pagefind 索引没生成 | 确认 `pnpm build` 跑完，`dist/pagefind/` 存在 |
+| `/search` 空白 | Pagefind 索引没生成 | 确认 `bun run build` 跑完，`dist/pagefind/` 存在 |
 | 数学公式显示为 `$E=mc^2$` raw 文本 | `math: true` 标志位没设 | 在 frontmatter 加 `math: true` |
 | Cloudflare Web Analytics 没数据 | 浏览器拦截 beacon 脚本 | 检查广告拦截器；用 `view-source:` 确认 beacon 标签存在 |

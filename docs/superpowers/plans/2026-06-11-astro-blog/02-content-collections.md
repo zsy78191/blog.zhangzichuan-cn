@@ -12,9 +12,9 @@
 **前置：** 子计划 01 完成
 
 **完成标志：**
-- `pnpm typecheck` 通过
-- `pnpm test` 通过（vitest）
-- `pnpm build` 中 `getCollection` 调用零错；草稿不出现在 `dist/blog/` 下
+- `bun run typecheck` 通过
+- `bun run test` 通过（vitest）
+- `bun run build` 中 `getCollection` 调用零错；草稿不出现在 `dist/blog/` 下
 
 ---
 
@@ -27,8 +27,8 @@
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add @astrojs/mdx
-pnpm add -D vitest @vitest/ui happy-dom
+bun add @astrojs/mdx
+bun add -d vitest @vitest/ui happy-dom
 ```
 
 - [ ] **Step 2：写入 `vitest.config.ts`**
@@ -86,7 +86,7 @@ export default defineConfig({
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add package.json pnpm-lock.yaml vitest.config.ts
+git add package.json bun.lock vitest.config.ts
 git commit -m "chore(test): add vitest + happy-dom + mdx integration"
 ```
 
@@ -122,7 +122,7 @@ describe('formatDate', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module '@utils/formatDate'"
 ```
 
@@ -143,7 +143,7 @@ export function formatDate(d: Date): string {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：2 passed
 ```
 
@@ -175,7 +175,7 @@ describe('filterDraft', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module '@utils/filterDraft'"
 ```
 
@@ -195,7 +195,7 @@ export function filterDraft<T extends HasDraft>(posts: T[]): T[] {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：4 passed
 ```
 
@@ -232,7 +232,7 @@ describe('sortByPubDatetime', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module"
 ```
 
@@ -255,7 +255,7 @@ export function sortByPubDatetime<T extends HasPubDatetime>(posts: T[]): T[] {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：6 passed
 ```
 
@@ -263,17 +263,17 @@ pnpm test
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
-pnpm lint
-pnpm format
-pnpm format:check
+bun run typecheck
+bun run lint
+bun run format
+bun run format:check
 ```
 
 - [ ] **Step 14：提交**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add src/utils/ tests/ vitest.config.ts package.json pnpm-lock.yaml
+git add src/utils/ tests/ vitest.config.ts package.json bun.lock
 git commit -m "feat(content): add date, draft filter, sort utils with TDD"
 ```
 
@@ -331,7 +331,7 @@ export default defineConfig({
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
+bun run typecheck
 # 期望：0 errors
 ```
 
@@ -432,14 +432,14 @@ tags: ['草稿']
 draft: true
 ---
 
-这篇是草稿。本地 `pnpm dev` 可见，`pnpm build` 中应被 `filterDraft` 排除。
+这篇是草稿。本地 `bun run dev` 可见，`bun run build` 中应被 `filterDraft` 排除。
 ```
 
 - [ ] **Step 4：跑 build 验证**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 ```
 
 此时还没有任何页面渲染 `blog` 集合，所以 dist/ 中**不会**有 blog 路径。验证 schema 工作正常就够了。`getCollection` 的过滤行为会在子计划 04 接入首页时再验证。
@@ -448,7 +448,7 @@ pnpm build
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 6：提交**
@@ -499,7 +499,7 @@ describe('getAllTags', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module"
 ```
 
@@ -527,7 +527,7 @@ export function getAllTags<T extends HasTags>(posts: T[]): { tag: string; count:
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：8 passed
 ```
 
@@ -563,7 +563,7 @@ describe('getAllCategories', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module"
 ```
 
@@ -593,12 +593,12 @@ export function getAllCategories<T extends HasCategory>(
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
-pnpm typecheck
-pnpm lint
-pnpm format
-pnpm format:check
-pnpm build
+bun run test
+bun run typecheck
+bun run lint
+bun run format
+bun run format:check
+bun run build
 ```
 
 期望：全部退出码 0。
@@ -618,8 +618,8 @@ git tag phase-02-content
 
 进入 `03-core-components.md` 前确认：
 
-- [ ] `pnpm test` 10 个测试全过
-- [ ] `pnpm typecheck && pnpm lint && pnpm format:check && pnpm build` 全绿
+- [ ] `bun run test` 10 个测试全过
+- [ ] `bun run typecheck && bun run lint && bun run format:check && bun run build` 全绿
 - [ ] `git tag phase-02-content` 已存在
 - [ ] `src/content.config.ts` schema 字段：title/description/pubDatetime/updatedDatetime?/tags/category?/draft/math/mermaid
 - [ ] utils 列表：`formatDate`、`filterDraft`、`sortByPubDatetime`、`getAllTags`、`getAllCategories`

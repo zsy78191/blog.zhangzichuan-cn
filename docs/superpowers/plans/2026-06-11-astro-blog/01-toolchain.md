@@ -10,7 +10,7 @@
 
 **前置：** 子计划 00 完成
 
-**完成标志：** `pnpm typecheck`、`pnpm lint`、`pnpm format:check`、`pnpm build` 全部退出码 0；`src/consts.ts` 在 strict 下零错误。
+**完成标志：** `bun run typecheck`、`bun run lint`、`bun run format:check`、`bun run build` 全部退出码 0；`src/consts.ts` 在 strict 下零错误。
 
 ---
 
@@ -47,14 +47,14 @@
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D @astrojs/check typescript
+bun add -d @astrojs/check typescript
 ```
 
 - [ ] **Step 3：跑 typecheck（首次可能因 consts 未在 index.astro 解构失败）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
+bun run typecheck
 ```
 
 - [ ] **Step 4：修正 `src/pages/index.astro` 让解构符合 strict**
@@ -89,7 +89,7 @@ const { title, description, locale } = SITE;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
+bun run typecheck
 # 期望：0 errors 0 warnings
 ```
 
@@ -97,7 +97,7 @@ pnpm typecheck
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add tsconfig.json package.json pnpm-lock.yaml src/pages/index.astro
+git add tsconfig.json package.json bun.lock src/pages/index.astro
 git commit -m "chore(toolchain): enable TypeScript strictest with path aliases"
 ```
 
@@ -115,7 +115,7 @@ git commit -m "chore(toolchain): enable TypeScript strictest with path aliases"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D eslint@^9 typescript-eslint \
+bun add -d eslint@^9 typescript-eslint \
   eslint-plugin-astro@^1 eslint-plugin-jsx-a11y \
   globals \
   prettier prettier-plugin-astro
@@ -140,7 +140,7 @@ export default [
       '.astro/**',
       'pagefind/**',
       'public/**',
-      'pnpm-lock.yaml',
+      'bun.lock',
     ],
   },
   js.configs.recommended,
@@ -198,7 +198,7 @@ dist
 node_modules
 .astro
 pagefind
-pnpm-lock.yaml
+bun.lock
 public/pagefind
 ```
 
@@ -227,19 +227,19 @@ public/pagefind
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
-pnpm lint
-pnpm format:check
+bun run typecheck
+bun run lint
+bun run format:check
 # 三条命令都期望退出码 0
 ```
 
-如 `pnpm format:check` 失败，跑 `pnpm format` 自动格式化后重试。
+如 `bun run format:check` 失败，跑 `bun run format` 自动格式化后重试。
 
 - [ ] **Step 7：跑 build 验证**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：astro check 阶段无错；astro build 输出 dist/
 ```
 
@@ -247,7 +247,7 @@ pnpm build
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add eslint.config.js .prettierrc .prettierignore package.json pnpm-lock.yaml
+git add eslint.config.js .prettierrc .prettierignore package.json bun.lock
 git commit -m "chore(toolchain): add ESLint 9 flat config + Prettier + scripts"
 ```
 
@@ -307,7 +307,7 @@ git commit -m "chore(toolchain): add VS Code recommended extensions and settings
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format:check && pnpm build
+bun run typecheck && bun run lint && bun run format:check && bun run build
 echo "ALL GREEN"
 ```
 
@@ -328,9 +328,9 @@ git tag --list 'phase-01*'
 
 进入 `02-content-collections.md` 前确认：
 
-- [ ] `pnpm typecheck` 0 错 0 警
-- [ ] `pnpm lint` 0 错
-- [ ] `pnpm format:check` 全文件通过
-- [ ] `pnpm build` 成功
+- [ ] `bun run typecheck` 0 错 0 警
+- [ ] `bun run lint` 0 错
+- [ ] `bun run format:check` 全文件通过
+- [ ] `bun run build` 成功
 - [ ] `git tag phase-01-toolchain` 已存在
 - [ ] `tsconfig.json` 中路径别名 `@components/*`、`@layouts/*`、`@utils/*`、`@consts` 全部可用

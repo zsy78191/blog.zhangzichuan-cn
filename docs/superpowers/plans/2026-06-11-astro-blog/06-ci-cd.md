@@ -13,7 +13,7 @@
 **完成标志：**
 - YAML 语法正确（`actionlint` 通过）
 - `wrangler.toml` 字段填写正确
-- `pnpm build` 仍全绿
+- `bun run build` 仍全绿
 - README 文档说明如何创建 secrets
 
 ---
@@ -54,7 +54,7 @@ pages_build_output_dir = "dist"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：与之前一致
 ```
 
@@ -99,40 +99,36 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        # m11：pnpm 版本必须传字符串 "9"，不要传整数 9（pnpm/action-setup@v4 内部
-        # 会对 version 做语义比较，传数字会被识别为无效或默认到 latest）。
-        with:
-          version: '9'
+      - name: Setup bun
+        uses: oven/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: bun
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       # B1：构建需要 chromium（rehype-mermaid strategy: 'img'）；CI 与 deploy 都要装
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Typecheck
-        run: pnpm typecheck
+        run: bun run typecheck
 
       - name: Lint
-        run: pnpm lint
+        run: bun run lint
 
       - name: Format check
-        run: pnpm format:check
+        run: bun run format:check
 
       - name: Unit tests
-        run: pnpm test
+        run: bun run test
 
       - name: Build
-        run: pnpm build
+        run: bun run build
 
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
@@ -157,7 +153,7 @@ npx --yes actionlint .github/workflows/ci.yml
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 ```
 
 - [ ] **Step 4：提交**
@@ -176,7 +172,7 @@ git commit -m "ci: GitHub Actions workflow for typecheck/lint/test/build"
 - 创建：`.github/workflows/deploy.yml`
 
 > B4：原计划用 `cloudflare/pages-action@v1`，该 action 已被官方 archive（"Pages 部署请使用 wrangler-action"）。改用 `cloudflare/wrangler-action@v3`，通过 `command: pages deploy dist --project-name=...` 直接调用 wrangler。
-> 同步在两个 workflow 中安装 Playwright Chromium（rehype-mermaid SSR 必需）。Step 安装时间约 30s，pnpm 缓存能避免重复下载。
+> 同步在两个 workflow 中安装 Playwright Chromium（rehype-mermaid SSR 必需）。Step 安装时间约 30s，bun 缓存能避免重复下载。
 
 - [ ] **Step 1：写 `.github/workflows/deploy.yml`**
 
@@ -206,27 +202,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: '9'
+      - name: Setup bun
+        uses: oven/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: bun
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       # B1：rehype-mermaid strategy: 'img' 在构建时启动 headless chromium 渲染 SVG。
-      # 复用 pnpm 已装的 playwright CLI 下载 chromium，--with-deps 会装系统依赖。
+      # 复用 bun 已装的 playwright CLI 下载 chromium，--with-deps 会装系统依赖。
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Build
-        run: pnpm build
+        run: bun run build
 
       # B4：cloudflare/wrangler-action@v3 是当前官方维护的 Cloudflare 部署 action。
       # 之前用的 pages-action@v1 已 archive。
@@ -252,7 +246,7 @@ npx --yes actionlint .github/workflows/deploy.yml
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 ```
 
 - [ ] **Step 4：提交**
@@ -340,8 +334,8 @@ labels: enhancement
 ## 本地开发
 
 ```bash
-pnpm install
-pnpm dev      # http://localhost:4321
+bun install
+bun run dev      # http://localhost:4321
 ```
 
 ## 写作
@@ -378,13 +372,13 @@ push `main` → CI 全绿 → 部署到 Cloudflare Pages。
 ## 脚本
 
 ```bash
-pnpm dev         # 本地开发
-pnpm typecheck   # TypeScript + frontmatter schema
-pnpm lint        # ESLint
-pnpm format      # Prettier 写入
-pnpm format:check
-pnpm test        # vitest
-pnpm build       # astro check + astro build + pagefind
+bun run dev         # 本地开发
+bun run typecheck   # TypeScript + frontmatter schema
+bun run lint        # ESLint
+bun run format      # Prettier 写入
+bun run format:check
+bun run test        # vitest
+bun run build       # astro check + astro build + pagefind
 ```
 
 ## 备案
@@ -400,7 +394,7 @@ pnpm build       # astro check + astro build + pagefind
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format && pnpm test && pnpm build
+bun run typecheck && bun run lint && bun run format && bun run test && bun run build
 echo "ALL GREEN"
 ```
 
@@ -423,5 +417,5 @@ git tag phase-06-cicd
 - [ ] `.github/workflows/deploy.yml` 语法校验通过
 - [ ] `wrangler.toml` 字段：name=`blog-zhangzichuan-cn`、compatibility_date=2026-06-12、pages_build_output_dir=dist
 - [ ] README 写明所需的 3 个 secrets
-- [ ] `pnpm build` 仍成功
+- [ ] `bun run build` 仍成功
 - [ ] `git tag phase-06-cicd` 已存在

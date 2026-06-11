@@ -28,15 +28,15 @@
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D lighthouse
+bun add -d lighthouse
 ```
 
 - [ ] **Step 2：本地 build + preview**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
-pnpm preview &
+bun run build
+bun run preview &
 PREVIEW_PID=$!
 sleep 3
 echo "preview started pid=$PREVIEW_PID"
@@ -128,27 +128,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        # B6：原版缺失 pnpm/Node setup，lychee job 会因 pnpm 命令不存在而失败
-        uses: pnpm/action-setup@v4
-        with:
-          version: '9'
+      - name: Setup bun
+        # B6：原版缺失 bun/Node setup，lychee job 会因 bun 命令不存在而失败
+        uses: oven/setup-bun@v2
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: pnpm
+          cache: bun
 
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: bun install --frozen-lockfile
 
       # B1：构建需要 chromium（rehype-mermaid strategy: 'img'）
       - name: Install Playwright Chromium
-        run: pnpm exec playwright install --with-deps chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Build
-        run: pnpm build
+        run: bun run build
 
       - name: lychee link checker
         uses: lycheeverse/lychee-action@v2
@@ -177,7 +175,7 @@ npx --yes actionlint .github/workflows/links.yml
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 ```
 
 - [ ] **Step 4：提交**
@@ -205,8 +203,8 @@ git commit -m "ci: weekly Lychee link check, GitHub Issue on failure"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D @playwright/test
-pnpm exec playwright install --with-deps chromium
+bun add -d @playwright/test
+bunx playwright install --with-deps chromium
 ```
 
 - [ ] **Step 3：写 `playwright.config.ts`**
@@ -227,7 +225,7 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   webServer: {
-    command: 'pnpm preview',
+    command: 'bun run preview',
     url: 'http://localhost:4321',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,
@@ -304,7 +302,7 @@ test('search returns results for "你好"', async ({ page }) => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm e2e
+bun run e2e
 # 期望：3 passed
 ```
 
@@ -312,7 +310,7 @@ pnpm e2e
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format && pnpm test && pnpm build && pnpm e2e
+bun run typecheck && bun run lint && bun run format && bun run test && bun run build && bun run e2e
 echo "ALL GREEN"
 ```
 
@@ -320,7 +318,7 @@ echo "ALL GREEN"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add tests/e2e/ playwright.config.ts package.json pnpm-lock.yaml
+git add tests/e2e/ playwright.config.ts package.json bun.lock
 git commit -m "test(e2e): Playwright smoke tests for home/dark-mode/search"
 ```
 
@@ -353,7 +351,7 @@ URL：https://dash.cloudflare.com/?to=/:account/web-analytics
 逐条对照 SPEC §15：
 
 ```markdown
-- [ ] pnpm typecheck / lint / format:check / build 全部通过
+- [ ] bun run typecheck / lint / format:check / build 全部通过
 - [ ] 推 main 后 ≤ 5 分钟博客可访问
 - [ ] https://blog.zhangzichuan.cn/ 首页展示 5 篇文章 + 简介
 - [ ] 页脚固定位置显示 苏ICP备18064390号-8 跳转至工信部
@@ -378,7 +376,7 @@ git push origin --tags
 如做了 8.3，修改 `README.md` 的"脚本"段补：
 
 ```markdown
-pnpm e2e         # Playwright e2e（需先 pnpm build）
+bun run e2e         # Playwright e2e（需先 bun run build）
 ```
 
 并提交：
@@ -415,7 +413,7 @@ cd /Users/zhangchao/2026/blog
 # 1. 新建 markdown
 $EDITOR src/content/blog/my-new-post.md
 # 2. 跑门禁
-pnpm typecheck && pnpm lint && pnpm format && pnpm build
+bun run typecheck && bun run lint && bun run format && bun run build
 # 3. 提交
 git add src/content/blog/
 git commit -m "post: My New Post title"
@@ -431,5 +429,5 @@ git push origin main
 |---|---|
 | Lighthouse Performance < 90 | 跑 `--view` 看具体指标；最大可能是 LCP（图片）或 CLS（字体） |
 | Lychee 周报一直失败 | 大概率是网络问题，跑本地 `lychee --offline 'dist/**/*.html'` 验证 HTML 链接 |
-| e2e 偶发失败 | 加 `--retries=2`；本地跑 `pnpm e2e --headed` 看具体哪一步 |
+| e2e 偶发失败 | 加 `--retries=2`；本地跑 `bun run e2e --headed` 看具体哪一步 |
 | Web Analytics 没数据 | 浏览器开发者工具 → Network → 找 `beacon.min.js` 请求；如被拦截，加 `defer` 改 `async` |

@@ -11,8 +11,8 @@
 **前置：** 子计划 02 完成
 
 **完成标志：**
-- `pnpm test` 全部测试通过
-- `pnpm build` 通过
+- `bun run test` 全部测试通过
+- `bun run build` 通过
 - 验证 `<Footer>` 输出含 `苏ICP备18064390号-8` 与 `https://beian.miit.gov.cn/`
 - 验证 `<PostCard>` 渲染 title/date/tags
 - 验证 `<TagList>` 生成正确 URL
@@ -28,7 +28,7 @@
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D @types/node
+bun add -d @types/node
 ```
 
 - [ ] **Step 2：确认 `astro` 暴露 container API**
@@ -39,7 +39,7 @@ pnpm add -D @types/node
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add package.json pnpm-lock.yaml
+git add package.json bun.lock
 git diff --cached --quiet || git commit -m "chore(test): ensure @types/node for container tests"
 ```
 
@@ -86,7 +86,7 @@ describe('Footer', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module '@components/Footer.astro'"
 ```
 
@@ -161,7 +161,7 @@ const year = new Date().getFullYear();
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：2 passed
 ```
 
@@ -169,7 +169,7 @@ pnpm test
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 6：提交**
@@ -276,7 +276,7 @@ const { activeNav } = Astro.props as Props;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
+bun run typecheck
 # 期望：因 ThemeToggle 不存在而失败
 ```
 
@@ -348,14 +348,14 @@ pnpm typecheck
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 3：跑 build 验证（应成功）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：成功
 ```
 
@@ -417,7 +417,7 @@ describe('PostCard', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL "Cannot find module"
 ```
 
@@ -504,7 +504,7 @@ const href = `/posts/${post.id}`;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：3 passed
 ```
 
@@ -512,7 +512,7 @@ pnpm test
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 6：提交**
@@ -557,7 +557,7 @@ describe('TagList', () => {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：FAIL
 ```
 
@@ -607,7 +607,7 @@ const { tags } = Astro.props as Props;
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test
+bun run test
 # 期望：4 passed
 ```
 
@@ -699,7 +699,7 @@ git commit -m "feat(components): TagList with TDD"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 3：提交**
@@ -721,7 +721,7 @@ git commit -m "feat(components): Prose wrapper for article typography"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build
+bun run test && bun run typecheck && bun run lint && bun run format:check && bun run build
 echo "ALL GREEN"
 ```
 
@@ -740,8 +740,8 @@ git tag --list 'phase-03*'
 
 进入 `04-layouts-and-pages.md` 前确认：
 
-- [ ] `pnpm test` 4 个组件测试全过
-- [ ] `pnpm typecheck && pnpm lint && pnpm format:check && pnpm build` 全绿
+- [ ] `bun run test` 4 个组件测试全过
+- [ ] `bun run typecheck && bun run lint && bun run format:check && bun run build` 全绿
 - [ ] `git tag phase-03-components` 已存在
 - [ ] 组件清单：Header / Footer / ThemeToggle / PostCard / TagList / Prose
 - [ ] `PostCard` 链接形如 `/posts/<id>`（子计划 04 会建立对应动态路由）

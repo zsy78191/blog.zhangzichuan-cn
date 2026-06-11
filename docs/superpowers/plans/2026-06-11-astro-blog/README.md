@@ -6,7 +6,7 @@
 
 **Architecture：** Astro 5.x fork 自 Astro Paper 模板，纯静态 SSG 输出 `dist/`，由 GitHub Actions 在 push `main` 时构建并调用 Cloudflare Pages API 部署；本地 Markdown 通过 Content Collections 强类型 schema 校验。
 
-**Tech Stack：** Astro 5.x · TypeScript strict · pnpm · Content Collections (zod) · Pagefind · KaTeX · Mermaid · Cloudflare Pages · GitHub Actions · Cloudflare Web Analytics · Noto Sans SC（本地子集）
+**Tech Stack：** Astro 5.x · TypeScript strict · bun · Content Collections (zod) · Pagefind · KaTeX · Mermaid · Cloudflare Pages · GitHub Actions · Cloudflare Web Analytics · Noto Sans SC（本地子集）
 
 **Spec：** `docs/superpowers/specs/2026-06-11-astro-blog-design.md`
 
@@ -19,7 +19,7 @@
 | # | 子计划 | 内容 | 前置 |
 |---|---|---|---|
 | 00 | `00-scaffolding.md` | fork Astro Paper、调整 `consts.ts`、`.gitignore`、基础 Astro 配置 | — |
-| 01 | `01-toolchain.md` | pnpm、TypeScript strict、ESLint、Prettier、`tsconfig.json`、package.json scripts | 00 |
+| 01 | `01-toolchain.md` | bun、TypeScript strict、ESLint、Prettier、`tsconfig.json`、package.json scripts | 00 |
 | 02 | `02-content-collections.md` | `src/content.config.ts` schema + 示例文章 + 草稿过滤工具 | 01 |
 | 03 | `03-core-components.md` | Header / Footer（含 ICP）/ ThemeToggle / PostCard / TagList / Prose | 02 |
 | 04 | `04-layouts-and-pages.md` | BaseLayout / PostLayout + 5 个核心页面（index/about/archive/tags/categories/404） | 02, 03 |
@@ -61,7 +61,7 @@
 ### 1. 路径与命名
 
 - **项目根**：`/Users/zhangchao/2026/blog/`
-- **包管理器**：pnpm 9.x
+- **包管理器**：bun 1.x
 - **Node 版本**：22.x LTS
 - **包名**：`blog-zhangzichuan-cn`（package.json `name` 字段）
 - **站点配置单一可信源**：`src/consts.ts`
@@ -135,6 +135,6 @@ phase-08-quality
 
 ### 6. 测试约定
 
-- **L1 必做**：`astro check`（TS + frontmatter schema）、`eslint`、CI 中 `pnpm build` 跑通
+- **L1 必做**：`astro check`（TS + frontmatter schema）、`eslint`、CI 中 `bun run build` 跑通
 - **L2 推荐**（子计划 03、04 内含）：`vitest` + `astro/container` 组件契约测试
 - **L3 端到端**（子计划 08 末尾可选）：`@playwright/test` 3 条路径

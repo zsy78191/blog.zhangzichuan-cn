@@ -11,7 +11,7 @@
 **前置：** 子计划 04 完成
 
 **完成标志：**
-- `pnpm build` 完成后 `dist/pagefind/` 存在
+- `bun run build` 完成后 `dist/pagefind/` 存在
 - `/search` 页面可用
 - `/rss.xml` 输出有效 RSS 2.0，含 ≥2 篇文章（草稿不在内）
 - 含 math 标志位的文章构建后 HTML 中含 KaTeX class
@@ -29,16 +29,16 @@
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add -D pagefind @astrojs/sitemap playwright
-pnpm add remark-math rehype-katex rehype-mermaid remark-gfm
-pnpm add -D katex
+bun add -d pagefind @astrojs/sitemap playwright
+bun add remark-math rehype-katex rehype-mermaid remark-gfm
+bun add -d katex
 ```
 
 - [ ] **Step 2：安装 Playwright 的 Chromium 浏览器（mermaid SSR 必需）**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm exec playwright install --with-deps chromium
+bunx playwright install --with-deps chromium
 ```
 
 > `rehype-mermaid` 默认会用 `playwright-core` + 系统已装的浏览器；为了 CI/本地一致，显式安装 chromium。CI 流程在子计划 06 处理。
@@ -53,7 +53,7 @@ pnpm exec playwright install --with-deps chromium
   "scripts": {
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro check && astro build && pnpm run search:build",
+    "build": "astro check && astro build && bun run search:build",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
@@ -74,14 +74,14 @@ pnpm exec playwright install --with-deps chromium
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck
+bun run typecheck
 ```
 
 - [ ] **Step 5：提交**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add package.json pnpm-lock.yaml
+git add package.json bun.lock
 git commit -m "chore(deps): add pagefind, sitemap, katex, mermaid, playwright"
 ```
 
@@ -136,7 +136,7 @@ export default defineConfig({
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：with-math-and-mermaid 文章的 dist HTML 含 katex class 与 mermaid 相关标记
 grep -l 'katex' dist/posts/with-math-and-mermaid/index.html
 # 期望有匹配
@@ -146,7 +146,7 @@ grep -l 'katex' dist/posts/with-math-and-mermaid/index.html
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format && pnpm test
+bun run typecheck && bun run lint && bun run format && bun run test
 ```
 
 - [ ] **Step 4：提交**
@@ -218,7 +218,7 @@ import BaseLayout from '@layouts/BaseLayout.astro';
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：dist/pagefind/ 目录存在
 ls dist/pagefind/ | head
 # 期望：index/, pagefind.js, pagefind-ui.js, pagefind-ui.css 等
@@ -228,7 +228,7 @@ ls dist/pagefind/ | head
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 4：提交**
@@ -250,7 +250,7 @@ git commit -m "feat(search): Pagefind UI on /search with noscript fallback"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add @astrojs/rss
+bun add @astrojs/rss
 ```
 
 - [ ] **Step 2：写 `src/pages/rss.xml.ts`**
@@ -290,7 +290,7 @@ export async function GET(context: APIContext) {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # 期望：dist/rss.xml 存在且包含 RSS 2.0 标记
 head -20 dist/rss.xml
 # 期望：包含 <rss version="2.0">
@@ -302,7 +302,7 @@ grep -c '<item>' dist/rss.xml
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 5：提交**
@@ -327,7 +327,7 @@ git commit -m "feat(rss): RSS 2.0 feed filtered for drafts"
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm add @fontsource/noto-sans-sc
+bun add @fontsource/noto-sans-sc
 ```
 
 - [ ] **Step 2：写 `src/styles/fonts.css`**
@@ -378,7 +378,7 @@ html {
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm build
+bun run build
 # @fontsource 字体在 Vite 处理后落到 dist/_astro/，文件名带哈希
 ls dist/_astro/ | grep -i 'noto' | head
 # 期望：看到 noto-sans-sc-<hash>.woff2 等
@@ -388,14 +388,14 @@ ls dist/_astro/ | grep -i 'noto' | head
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm typecheck && pnpm lint && pnpm format
+bun run typecheck && bun run lint && bun run format
 ```
 
 - [ ] **Step 7：提交**
 
 ```bash
 cd /Users/zhangchao/2026/blog
-git add package.json pnpm-lock.yaml src/styles/fonts.css src/styles/global.css src/layouts/BaseLayout.astro
+git add package.json bun.lock src/styles/fonts.css src/styles/global.css src/layouts/BaseLayout.astro
 git commit -m "feat(fonts): use @fontsource/noto-sans-sc (offline, no CDN fetch)"
 ```
 
@@ -410,7 +410,7 @@ git commit -m "feat(fonts): use @fontsource/noto-sans-sc (offline, no CDN fetch)
 
 ```bash
 cd /Users/zhangchao/2026/blog
-pnpm test && pnpm typecheck && pnpm lint && pnpm format:check && pnpm build
+bun run test && bun run typecheck && bun run lint && bun run format:check && bun run build
 echo "ALL GREEN"
 ```
 
@@ -449,7 +449,7 @@ git tag --list 'phase-05*'
 
 进入 `06-ci-cd.md` 前确认：
 
-- [ ] `pnpm build` 成功
+- [ ] `bun run build` 成功
 - [ ] `dist/pagefind/`、`dist/rss.xml`、`dist/fonts/NotoSansSC-Regular.subset.woff2` 全部存在
 - [ ] KaTeX/Mermaid 在带标志位的文章中渲染
 - [ ] 草稿不出现在任何 dist 路径

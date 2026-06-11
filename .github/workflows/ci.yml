@@ -43,8 +43,9 @@ jobs:
       - name: Format check
         run: bun run format:check
 
+      # bun 运行时与 zod 的 ESM 重导出不兼容，使用 Node.js 运行 vitest
       - name: Unit tests
-        run: bun run test
+        run: node ./node_modules/.bin/vitest run
 
       - name: Build
         run: bun run build

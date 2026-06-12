@@ -16,7 +16,32 @@ export default defineConfig({
   integrations: [mdx(), sitemap()],
   markdown: {
     remarkPlugins: [remarkGfm, remarkMath],
-    rehypePlugins: [rehypeKatex, [rehypeMermaid, { strategy: 'img-svg' }]],
+    rehypePlugins: [
+      rehypeKatex,
+      [
+        rehypeMermaid,
+        {
+          strategy: 'img-svg',
+          mermaid: {
+            theme: 'base',
+            themeVariables: {
+              primaryColor: '#2563eb',
+              primaryTextColor: '#ffffff',
+              primaryBorderColor: '#1d4ed8',
+              lineColor: '#94a3b8',
+              textColor: '#1e293b',
+              mainBkg: '#ffffff',
+              nodeBorder: '#e2e8f0',
+              clusterBkg: '#f8fafc',
+              clusterBorder: '#e2e8f0',
+              titleColor: '#1e293b',
+              edgeLabelBackground: '#ffffff',
+              nodeTextColor: '#1e293b',
+            },
+          },
+        },
+      ],
+    ],
     shikiConfig: {
       theme: 'github-dark-dimmed',
       wrap: true,

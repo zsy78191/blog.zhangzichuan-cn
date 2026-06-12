@@ -46,3 +46,17 @@ main {
   margin: 0 auto;
   padding: 2rem 1rem;
 }
+
+/* Mermaid 图表样式 */
+img[id^='mermaid'] {
+  display: block;
+  margin: 2rem auto;
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+[data-theme='dark'] img[id^='mermaid'] {
+  background: var(--bg-muted);
+  filter: brightness(0.85) saturate(0.75);
+}

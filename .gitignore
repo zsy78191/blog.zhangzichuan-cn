@@ -33,3 +33,10 @@ lighthouse-*.report.html
 # wrangler
 .wrangler/
 .dev.vars
+
+# tooling
+.agents/
+.claude/
+.playwright-mcp/
+skills-lock.json
+screenshots/

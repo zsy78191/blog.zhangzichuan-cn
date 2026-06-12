@@ -9,7 +9,7 @@ interface Props {
   post: CollectionEntry<'blog'>;
 }
 const { post } = Astro.props as Props;
-const { title, description, pubDatetime, tags, math } = post.data;
+const { title, description, pubDatetime, tags } = post.data;
 
 // KaTeX CSS：Vite 构建时打到 _astro/ 目录，不依赖 CDN。
 // 只有 math: true 的文章才渲染 KaTeX 元素，这个 import 对所有文章都生效，

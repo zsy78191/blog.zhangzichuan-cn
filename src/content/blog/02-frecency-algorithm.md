@@ -56,11 +56,11 @@ WHERE pinned = 1 ORDER BY time DESC, id ASC
 
 **引用资料：**
 
-- Connor, M. & Spitzer, S. (2007). *Frecency algorithm*, MDN Web Docs
-- Ruderman, J. & Lebar, J. (2012). *A new frecency algorithm based on exponential decay*, Mozilla Wiki — [链接](https://wiki.mozilla.org/User:Jesse/NewFrecency)
+- Connor, M. & Spitzer, S. (2007). _Frecency algorithm_, MDN Web Docs
+- Ruderman, J. & Lebar, J. (2012). _A new frecency algorithm based on exponential decay_, Mozilla Wiki — [链接](https://wiki.mozilla.org/User:Jesse/NewFrecency)
 - Firefox Source Docs: [Legacy ranking](https://firefox-source-docs.mozilla.org/browser/urlbar/ranking-legacy.html) / [Current ranking](https://firefox-source-docs.mozilla.org/browser/urlbar/ranking.html)
 - ZZ 源码: [github.com/zsy78191/zz](https://github.com/zsy78191/zz)
 
 ---
 
-*zz 的 GitHub 上有 frecency 的 Node.js 实现，100 行代码带 SQLite 操作。比读论文快。*
+_zz 的 GitHub 上有 frecency 的 Node.js 实现，100 行代码带 SQLite 操作。比读论文快。_

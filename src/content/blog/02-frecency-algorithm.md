@@ -2,6 +2,7 @@
 title: 'Frecency：一个被 Mozilla 发明、被我塞进命令行工具的排序算法'
 description: '从 Firefox 3 的地址栏到我的命令行目录跳转工具，frecency 一直在帮我回答同一个问题：人用过的东西，怎么排序才算"聪明"？'
 pubDatetime: 2026-06-13
+math: true
 tags: ['算法', 'CLI', 'Firefox', '数据库', 'Node.js', 'ZZ']
 category: '技术'
 ---
